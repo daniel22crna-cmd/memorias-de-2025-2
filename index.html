@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo da Sorte</title>
+
+<style>
+  body {
+    background: #111;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 420px;
+    margin: auto;
+    padding: 20px;
+  }
+
+  h1 {
+    margin-bottom: 10px;
+  }
+
+  .info {
+    font-size: 18px;
+    margin: 6px 0;
+  }
+
+  .botoes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  button {
+    height: 60px;
+    font-size: 22px;
+    background: #00bcd4;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  button:active {
+    background: #0097a7;
+  }
+
+  #mensagem {
+    margin-top: 20px;
+    font-size: 18px;
+    min-height: 28px;
+  }
+
+  .audio-controls {
+    margin-top: 15px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🎮 Jogo da Sorte</h1>
+
+  <div class="info">❤️ Vidas: <span id="vidas">5</span></div>
+  <div class="info">🏁 Fase: <span id="fase">1</span> / 10</div>
+  <div class="info">⭐ Pontos: <span id="pontos">0</span></div>
+
+  <p>Escolha um número de 1 a 3:</p>
+
+  <div class="botoes">
+    <button onclick="jogar(1)">1</button>
+    <button onclick="jogar(2)">2</button>
+    <button onclick="jogar(3)">3</button>
+  </div>
+
+  <div id="mensagem"></div>
+
+  <div class="audio-controls">
+    <button onclick="tocarAudio()">▶️ Tocar música da fase</button>
+    <button onclick="pularAudio()">⏭️ Pular música</button>
+  </div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+  let vidas = 5;
+  let fase = 1;
+  let pontos = 0;
+  const FASE_MAX = 10;
+
+  const audios = [
+    "m1.mp3",
+    "m2.mp3",
+    "m3.mp3",
+    "m4.mp3",
+    "m5.mp3",
+    "m6.mp3",
+    "m7.mp3",
+    "m8.mp3",
+    "m9.mp3",
+    "m10.mp3"
+  ];
+
+  const audio = document.getElementById("audio");
+
+  function tocarAudio() {
+    audio.src = audios[fase - 1];
+    audio.play();
+  }
+
+  function pularAudio() {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  function jogar(escolha) {
+    if (fase > FASE_MAX) return;
+
+    const sorteado = Math.floor(Math.random() * 3) + 1;
+
+    if (escolha === sorteado) {
+      pontos += 2;
+      fase++;
+      document.getElementById("mensagem").innerText =
+        "✅ Acertou! Número sorteado: " + sorteado;
+      if (fase <= FASE_MAX) tocarAudio();
+    } else {
+      vidas--;
+      pontos--;
+      document.getElementById("mensagem").innerText =
+        "❌ Errou! Número sorteado: " + sorteado;
+    }
+
+    if (vidas <= 0) {
+      if (fase === 1) {
+        document.body.innerHTML =
+          "<h1>💀 GAME OVER</h1>" +
+          "<p>Você perdeu todas as vidas.</p>" +
+          "<p>⭐ Pontos finais: " + pontos + "</p>";
+        return;
+      } else {
+        fase--;
+        vidas = 5;
+        document.getElementById("mensagem").innerText =
+          "🔙 Você perdeu todas as vidas e voltou uma fase.";
+        tocarAudio();
+      }
+    }
+
+    atualizar();
+
+    if (fase > FASE_MAX) {
+      audio.pause();
+      document.body.innerHTML =
+        "<h1>🏆 Parabéns!</h1>" +
+        "<p>Você venceu a partida.</p>" +
+        "<p>Não se esqueça de seguir meu Instagram.</p>" +
+        "<p>Obrigado por jogar.</p>" +
+        "<br><p>⭐ Pontuação final: " + pontos + "</p>";
+    }
+  }
+
+  function atualizar() {
+    document.getElementById("vidas").innerText = vidas;
+    document.getElementById("fase").innerText = fase;
+    document.getElementById("pontos").innerText = pontos;
+  }
+</script>
+
+</body>
+</html>
